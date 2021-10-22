@@ -1,36 +1,31 @@
 package com.example.drawableapp;
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 
-
+import androidx.appcompat.app.AppCompatActivity;
 
 public class GalleryActivity extends AppCompatActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
+		// Hide the app label.
+		this.getSupportActionBar().hide();
 
-    Button button5;
+		this.setContentView(R.layout.activity_gallery);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
-
-        button5 = (Button)findViewById(R.id.button5);
-
-        button5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                Intent intent = new Intent(GalleryActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-    }
+		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
+		backButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent intent = new Intent(GalleryActivity.this, MainActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(intent);
+			}
+		});
+	}
 }
+
