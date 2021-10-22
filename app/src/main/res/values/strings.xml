@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Drawable App</string>
+    <string name="section">Gallery</string>
 </resources>

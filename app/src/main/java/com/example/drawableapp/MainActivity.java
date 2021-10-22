@@ -1,37 +1,53 @@
 package com.example.drawableapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-
-// This is used for TextView value manipulation.
-//import android.widget.TextView;
-
 import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
+
+    Button button;
+    Button button2;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // This function sets activity_draw.xml as the starting activity.
-        setContentView(R.layout.activity_draw);
-//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+
+        button = (Button)findViewById(R.id.button);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent intent = new Intent(MainActivity.this, DrawActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        button2 = (Button)findViewById(R.id.button2);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
     }
 
-    public void selectPen(View view) {
-        Art.get().selectPen();
-    }
 
-    public void selectEraser(View view) {
-        Art.get().selectEraser();
-    }
-
-    // THIS IS FOR DEBUGGING PURPOSES ONLY!!
-    public void updatePathSize(View view) {
-        // Select a layout.
-//        setContentView(R.layout.activity_draw);
-
-        // Find and manipulate the element.
-//        TextView tvPathSize = (TextView) findViewById(R.id.tvPathSize);
-//        tvPathSize.setText(String.valueOf(paths.size()));
-    }
 }
