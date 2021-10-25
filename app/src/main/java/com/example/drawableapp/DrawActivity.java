@@ -1,9 +1,11 @@
 package com.example.drawableapp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -13,6 +15,7 @@ public class DrawActivity extends AppCompatActivity {
 	private Art art;
 	private ImageButton penButton;
 	private ImageButton eraserButton;
+	private ImageButton saveButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,7 @@ public class DrawActivity extends AppCompatActivity {
 		this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
+		this.saveButton = (ImageButton) this.findViewById(R.id.menuButton);
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
@@ -36,6 +40,38 @@ public class DrawActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				saveArtDialog();
+			}
+		});
+	}
+
+	private void saveArtDialog(){
+		Dialog dialog = new Dialog(this);
+		dialog.setContentView(R.layout.view_save_project);
+
+		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
+		Button saveBtn = dialog.findViewById(R.id.save_button);
+
+
+		saveBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				dialog.dismiss();
+			}
+		});
+		cancelBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
 	}
 
 	public void selectPen(View view) {

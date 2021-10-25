@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "136054768222",
+    "project_id": "drawable-ae059",
+    "storage_bucket": "drawable-ae059.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136054768222:android:b4b812e04f0271a15beacf",
+        "android_client_info": {
+          "package_name": "com.example.drawableapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136054768222-4e9e87op1b3s6o2krdfo7rfmg01a23t7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOeRhj-gyZGEurgxyofYZm1tDg1w9JJU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136054768222-4e9e87op1b3s6o2krdfo7rfmg01a23t7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
