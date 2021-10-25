@@ -29,7 +29,7 @@ public class DrawActivity extends AppCompatActivity {
 		this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
-		this.saveButton = (ImageButton) this.findViewById(R.id.menuButton);
+		this.saveButton = (ImageButton) this.findViewById(R.id.saveButton);
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
