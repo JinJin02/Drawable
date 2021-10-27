@@ -2,20 +2,36 @@ package com.example.drawableapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 public class DrawActivity extends AppCompatActivity {
 	private Art art;
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
+	private View imgView;
+
+	FirebaseStorage storage = FirebaseStorage.getInstance();
+	//StorageReference storageRef = storage.getReferenceFromUrl("gs://testfordatabase-8081f.appspot.com");
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +47,8 @@ public class DrawActivity extends AppCompatActivity {
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.menuButton);
 
+		//imgView = (View) findViewById(R.id.art);
+
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -44,15 +62,16 @@ public class DrawActivity extends AppCompatActivity {
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				saveArtDialog();
+				imgView = (View) findViewById(R.id.art);
+				saveProjectDialog();
 			}
 		});
 	}
 
-	private void saveArtDialog(){
+	private void saveProjectDialog(){
 		Dialog dialog = new Dialog(this);
 		dialog.setContentView(R.layout.view_save_project);
+
 
 		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
 		Button saveBtn = dialog.findViewById(R.id.save_button);
@@ -61,6 +80,9 @@ public class DrawActivity extends AppCompatActivity {
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				EditText nameEditText = dialog.findViewById(R.id.name_edit_text);
+				String name = nameEditText.getText().toString();
+				uploadImage(name);
 				dialog.dismiss();
 			}
 		});
@@ -72,6 +94,41 @@ public class DrawActivity extends AppCompatActivity {
 		});
 
 		dialog.show();
+	}
+
+	public void uploadImage(String name){
+		// Create a storage reference from our app
+		StorageReference storageRef = storage.getReference();
+
+// Create a reference to "mountains.jpg"
+		StorageReference mountainsRef = storageRef.child(name + ".jpg");
+
+// Create a reference to 'images/mountains.jpg'
+		StorageReference mountainImagesRef = storageRef.child("images/" + name + ".jpg");
+
+		imgView.setDrawingCacheEnabled(true);
+		imgView.buildDrawingCache();
+		Bitmap bitmap = imgView.getDrawingCache();//((BitmapDrawable) imgView.getDrawable()).getBitmap();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+		byte[] data = baos.toByteArray();
+
+		UploadTask uploadTask = mountainsRef.putBytes(data);
+		uploadTask.addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				// Handle unsuccessful uploads
+			}
+		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+			@Override
+			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+				// ...
+			}
+		});
+
+
 	}
 
 	public void selectPen(View view) {
