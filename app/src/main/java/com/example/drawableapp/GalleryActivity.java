@@ -12,6 +12,7 @@ public class GalleryActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+
 		// Hide the app label.
 		this.getSupportActionBar().hide();
 
@@ -19,6 +20,8 @@ public class GalleryActivity extends AppCompatActivity {
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
+
+
 			@Override
 			public void onClick(View view) {
 				Intent intent = new Intent(GalleryActivity.this, MainActivity.class);

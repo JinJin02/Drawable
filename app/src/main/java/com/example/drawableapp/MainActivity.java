@@ -2,9 +2,11 @@ package com.example.drawableapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
 		Button drawActivityButton = (Button) this.findViewById(R.id.drawActivityButton);
 		drawActivityButton.setOnClickListener(new View.OnClickListener() {
+
 			@Override
 			public void onClick(View view) {
 				Intent intent = new Intent(MainActivity.this, DrawActivity.class);
@@ -34,6 +37,17 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+
+
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+		switch (item.getItemId()){
+			case R.id.undoButton:
+
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }
 

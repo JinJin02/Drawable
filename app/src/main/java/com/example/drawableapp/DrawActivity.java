@@ -16,6 +16,7 @@ public class DrawActivity extends AppCompatActivity {
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
+	private ImageButton undo,redo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,8 @@ public class DrawActivity extends AppCompatActivity {
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.saveButton);
+		this.undo = (ImageButton) this.findViewById(R.id.undoButton);
+		this.redo = (ImageButton) this.findViewById(R.id.redoButton);
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
@@ -41,6 +44,21 @@ public class DrawActivity extends AppCompatActivity {
 			}
 		});
 
+
+		undo.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				art.undo();
+			}
+		});
+
+		redo.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				art.redo();
+			}
+		});
+
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -48,6 +66,7 @@ public class DrawActivity extends AppCompatActivity {
 				saveArtDialog();
 			}
 		});
+
 	}
 
 	private void saveArtDialog(){
@@ -73,6 +92,7 @@ public class DrawActivity extends AppCompatActivity {
 
 		dialog.show();
 	}
+
 
 	public void selectPen(View view) {
 		((ColorDrawable) this.penButton.getBackground()).setColor(0xffbfbfbf);
