@@ -42,12 +42,12 @@ public class DrawActivity extends AppCompatActivity {
 
 		this.setContentView(R.layout.activity_draw);
 
-		this.art = (Art) this.findViewById(R.id.art);
+		//this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.menuButton);
 
-		//imgView = (View) findViewById(R.id.art);
+		imgView = (View) findViewById(R.id.art);
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +62,8 @@ public class DrawActivity extends AppCompatActivity {
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				imgView = (View) findViewById(R.id.art);
+
+				//imgView = (View) findViewById(R.id.art);
 				saveProjectDialog();
 			}
 		});
@@ -101,10 +102,11 @@ public class DrawActivity extends AppCompatActivity {
 		StorageReference storageRef = storage.getReference();
 
 // Create a reference to "mountains.jpg"
-		StorageReference mountainsRef = storageRef.child(name + ".jpg");
+		StorageReference projectRef = storageRef.child(name + ".jpg");
 
 // Create a reference to 'images/mountains.jpg'
 		StorageReference mountainImagesRef = storageRef.child("images/" + name + ".jpg");
+
 
 		imgView.setDrawingCacheEnabled(true);
 		imgView.buildDrawingCache();
@@ -113,7 +115,7 @@ public class DrawActivity extends AppCompatActivity {
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 		byte[] data = baos.toByteArray();
 
-		UploadTask uploadTask = mountainsRef.putBytes(data);
+		UploadTask uploadTask = projectRef.putBytes(data);
 		uploadTask.addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
@@ -122,7 +124,7 @@ public class DrawActivity extends AppCompatActivity {
 		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 			@Override
 			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
+				baos.reset();
 				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
 				// ...
 			}
