@@ -50,6 +50,11 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 				saveArtDialog();
 			}
 		});
+
+		Bundle bundle = this.getIntent().getExtras();
+		if (bundle != null) {
+			this.art.setBackgroundColor(bundle.getInt("BACKGROUND_COLOR"));
+		}
 	}
 
 	@Override

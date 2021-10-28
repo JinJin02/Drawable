@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -21,8 +21,7 @@ public class MainActivity extends AppCompatActivity {
 		drawActivityButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(MainActivity.this, DrawActivity.class);
-				startActivity(intent);
+				ColorPicker.get().show(MainActivity.this, ColorPicker.Mode.CREATE, 0xffffffff);
 			}
 		});
 
@@ -34,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
 				startActivity(intent);
 			}
 		});
+	}
+
+	@Override
+	public void onColorPickerOkClick(int pickedColor) {
+		Intent intent = new Intent(MainActivity.this, DrawActivity.class);
+		intent.putExtra("BACKGROUND_COLOR", pickedColor);
+		startActivity(intent);
 	}
 }
 
