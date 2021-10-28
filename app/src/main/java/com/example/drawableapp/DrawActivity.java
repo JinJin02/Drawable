@@ -11,8 +11,9 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class DrawActivity extends AppCompatActivity {
+public class DrawActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener {
 	private Art art;
+	private boolean penDialog = true;
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
@@ -31,6 +32,8 @@ public class DrawActivity extends AppCompatActivity {
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.saveButton);
 
+		this.drawSizeImageDot(this.art.getPenSize());
+
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -44,10 +47,34 @@ public class DrawActivity extends AppCompatActivity {
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 				saveArtDialog();
 			}
 		});
+	}
+
+	@Override
+	public void onColorPickerOkClick(int pickedColor) {
+		if (this.penDialog) {
+			this.art.setPenColor(pickedColor);
+		} else {
+			this.art.setBackgroundColor(pickedColor);
+		}
+	}
+
+	@Override
+	public void onSizeSeekerOkClick(int acceptedSize) {
+		this.drawSizeImageDot((float) acceptedSize);
+		this.art.setPenSize(acceptedSize);
+	}
+
+	private void drawSizeImageDot(float size) {
+		ImageView sizeImage = (ImageView) this.findViewById(R.id.sizeImage);
+
+		if (sizeImage.getDrawable() == null) {
+			sizeImage.setImageDrawable(new Dot(size));
+		} else {
+			((Dot) sizeImage.getDrawable()).setRadius(size);
+		}
 	}
 
 	private void saveArtDialog(){
@@ -56,7 +83,6 @@ public class DrawActivity extends AppCompatActivity {
 
 		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
 		Button saveBtn = dialog.findViewById(R.id.save_button);
-
 
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -74,18 +100,32 @@ public class DrawActivity extends AppCompatActivity {
 		dialog.show();
 	}
 
+	public void showColorPickerPen(View view) {
+		this.penDialog = true;
+		ColorPicker.get().show(this, ColorPicker.Mode.ALTER, this.art.getPenColor());
+	}
+
 	public void selectPen(View view) {
-		((ColorDrawable) this.penButton.getBackground()).setColor(0xffbfbfbf);
+		((ColorDrawable) view.getBackground()).setColor(0xffbfbfbf);
 		((ColorDrawable) this.eraserButton.getBackground()).setColor(0xffdfdfdf);
 
 		this.art.selectPen();
 	}
 
+	public void showSizeSeeker(View view) {
+		SizeSeeker.get().show(this, Math.round(Art.PEN_MIN_SIZE), Math.round(Art.PEN_MAX_SIZE), Math.round(this.art.getPenSize()));
+	}
+
 	public void selectEraser(View view) {
 		((ColorDrawable) this.penButton.getBackground()).setColor(0xffdfdfdf);
-		((ColorDrawable) this.eraserButton.getBackground()).setColor(0xffbfbfbf);
+		((ColorDrawable) view.getBackground()).setColor(0xffbfbfbf);
 
 		this.art.selectEraser();
+	}
+
+	public void showColorPickerBackground(View view) {
+		this.penDialog = false;
+		ColorPicker.get().show(this, ColorPicker.Mode.ALTER, this.art.getBackgroundColor());
 	}
 }
 
