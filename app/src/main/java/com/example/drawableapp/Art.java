@@ -45,6 +45,10 @@ public class Art extends ImageView {
 		this.pen.setStrokeWidth(10.0f);
 	}
 
+	public ArrayList<Path> getPaths(){
+		return paths;
+	}
+
 	// Purpose: This method is called when the object is touched. (Someone is attempting to draw.)
 	// Arguments: MotionEvent event
 	// Return: boolean
