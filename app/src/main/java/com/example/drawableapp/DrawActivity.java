@@ -48,7 +48,6 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
-		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
 
 		this.drawSizeImageDot(this.art.getPenSize());
 
