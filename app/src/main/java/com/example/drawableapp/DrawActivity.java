@@ -1,17 +1,23 @@
 package com.example.drawableapp;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +26,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 
@@ -30,6 +38,8 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
+	private ImageButton deleteButton;
+	private TextView nameTextView;
 
 
 	FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -48,7 +58,8 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
-		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
+		this.deleteButton = (ImageButton) this.findViewById(R.id.delete_button);
+		this.nameTextView = (TextView) this.findViewById(R.id.name_text_view);
 
 		this.drawSizeImageDot(this.art.getPenSize());
 
@@ -71,7 +82,21 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 				if(art.getName().isEmpty()){
 					saveProjectDialog();
 				} else {
+					Log.i("info", art.getName());
 					uploadImage(art.getName());
+				}
+
+			}
+		});
+
+		deleteButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				//kollar om project redan har ett namn och sparar isåfall över den filen
+				//annars öppnar den en dialog för att spara ett projekt för första gången
+				if(!art.getName().isEmpty()){
+					deleteProjectDialog(art.getName());
 				}
 
 			}
@@ -123,9 +148,14 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 				if(!name.isEmpty()) {
 					art.setName(name);
+					nameTextView.setText(name);
 					uploadImage(name);
 					dialog.dismiss();
 				}
+				Toast toast=Toast.makeText(getApplicationContext(),"Please enter a name!",Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+
 			}
 		});
 		cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +167,36 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 		dialog.show();
 	}
+
+	public void deleteProjectDialog(String name){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		//Setting message manually and performing action on button click
+		builder.setMessage("Do you want to delete this project?")
+				.setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						deleteProject(name);
+						Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+								Toast.LENGTH_SHORT).show();
+						recreate();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						//  Action for 'NO' Button
+						dialog.cancel();
+						Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
+								Toast.LENGTH_SHORT).show();
+					}
+				});
+		//Creating dialog box
+		AlertDialog alert = builder.create();
+		//Setting the title manually
+
+		alert.show();
+	}
+
+
 
 	public void showColorPickerPen(View view) {
 		this.penDialog = true;
@@ -169,9 +229,36 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 			@Override
 			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 				baos.reset();
+				Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
 				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
 				// ...
 				art.setDrawingCacheEnabled(false);
+			}
+		});
+	}
+
+
+
+	public void deleteProject(String name){
+
+		StorageReference projectRef = storageRef.child(name +".jpg");
+
+// Delete the file
+		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+			@Override
+			public void onSuccess(Void aVoid) {
+				Log.i("info", "it worked");
+
+				/*art = (Art) findViewById(R.id.art);
+				nameTextView = (TextView) findViewById(R.id.name_text_view);
+				art.setName("");*/
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				Log.i("info", "uh-oh");
 			}
 		});
 	}
