@@ -2,21 +2,39 @@ package com.example.drawableapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class DrawActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener {
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+
+public class DrawActivity extends AppCompatActivity {
 	private Art art;
 	private boolean penDialog = true;
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
+
+
+	FirebaseStorage storage = FirebaseStorage.getInstance();
+	StorageReference storageRef = storage.getReference();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +48,7 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
+		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
 		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
 
 		this.drawSizeImageDot(this.art.getPenSize());
@@ -47,7 +66,15 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		saveButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				saveArtDialog();
+
+				//kollar om project redan har ett namn och sparar isåfall över den filen
+				//annars öppnar den en dialog för att spara ett projekt för första gången
+				if(art.getName().isEmpty()){
+					saveProjectDialog();
+				} else {
+					uploadImage(art.getName());
+				}
+
 			}
 		});
 
@@ -88,6 +115,7 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
 		Button saveBtn = dialog.findViewById(R.id.save_button);
+		EditText nameEditText = dialog.findViewById(R.id.name_edit_text);
 
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -108,6 +136,76 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 	public void showColorPickerPen(View view) {
 		this.penDialog = true;
 		ColorPicker.get().show(this, ColorPicker.Mode.ALTER, this.art.getPenColor());
+	}
+
+	public void uploadImage(String name){
+		// Create a reference to "mountains.jpg"
+		StorageReference projectRef = storageRef.child(name + ".jpg");
+
+		//ändra art viewn till en jpeg
+		art.setDrawingCacheEnabled(true);
+		art.buildDrawingCache();
+
+		Bitmap bitmap = art.getDrawingCache();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+		byte[] data = baos.toByteArray();
+
+
+		//ladda upp bilden
+		UploadTask uploadTask = projectRef.putBytes(data);
+		uploadTask.addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				// Handle unsuccessful uploads
+				Log.i("info",exception.getMessage());
+			}
+		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+			@Override
+			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+				baos.reset();
+				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+				// ...
+				art.setDrawingCacheEnabled(false);
+			}
+		});
+	}
+
+	public void deleteProject(String name){
+		StorageReference projectRef = storageRef.child(name +".jpg");
+
+// Delete the file
+		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+			@Override
+			public void onSuccess(Void aVoid) {
+				// File deleted successfully
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				// Uh-oh, an error occurred!
+			}
+		});
+	}
+
+
+	public void setNameExist(String name){
+
+		StorageReference projectRef = storageRef.child(name + ".jpg");
+		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+			@Override
+			public void onSuccess(Uri uri) {
+				Log.i("info","file exist");
+
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+
+				Log.i("info","file not found");
+
+			}
+		});
 	}
 
 	public void selectPen(View view) {
