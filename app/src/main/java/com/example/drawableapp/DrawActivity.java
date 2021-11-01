@@ -28,7 +28,7 @@ public class DrawActivity extends AppCompatActivity {
 	private ImageButton penButton;
 	private ImageButton eraserButton;
 	private ImageButton saveButton;
-	private Art projectArt;
+
 
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
@@ -42,12 +42,10 @@ public class DrawActivity extends AppCompatActivity {
 
 		this.setContentView(R.layout.activity_draw);
 
-		//this.art = (Art) this.findViewById(R.id.art);
+		this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
 		this.saveButton = (ImageButton) this.findViewById(R.id.save_button);
-
-		projectArt = (Art) findViewById(R.id.art);
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
 		backButton.setOnClickListener(new View.OnClickListener() {
@@ -66,10 +64,10 @@ public class DrawActivity extends AppCompatActivity {
 
 				//kollar om project redan har ett namn och sparar isåfall över den filen
 				//annars öppnar den en dialog för att spara ett projekt för första gången
-				if(projectArt.getName().isEmpty()){
+				if(art.getName().isEmpty()){
 					saveProjectDialog();
 				} else {
-					uploadImage(projectArt.getName());
+					uploadImage(art.getName());
 				}
 
 			}
@@ -88,11 +86,10 @@ public class DrawActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 
-
 				String name = nameEditText.getText().toString();
 
 				if(!name.isEmpty()) {
-					projectArt.setName(name);
+					art.setName(name);
 					uploadImage(name);
 					dialog.dismiss();
 				}
@@ -113,10 +110,10 @@ public class DrawActivity extends AppCompatActivity {
 		StorageReference projectRef = storageRef.child(name + ".jpg");
 
 		//ändra art viewn till en jpeg
-		projectArt.setDrawingCacheEnabled(true);
-		projectArt.buildDrawingCache();
+		art.setDrawingCacheEnabled(true);
+		art.buildDrawingCache();
 
-		Bitmap bitmap = projectArt.getDrawingCache();
+		Bitmap bitmap = art.getDrawingCache();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 		byte[] data = baos.toByteArray();
@@ -136,7 +133,7 @@ public class DrawActivity extends AppCompatActivity {
 				baos.reset();
 				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
 				// ...
-				projectArt.setDrawingCacheEnabled(false);
+				art.setDrawingCacheEnabled(false);
 			}
 		});
 	}
