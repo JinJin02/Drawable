@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 public class Art extends ImageView {
+	private String name;
 	private Paint pen = new Paint();
 	private Path path;
 	private ArrayList<Path> paths = new ArrayList<Path>();
@@ -43,10 +44,15 @@ public class Art extends ImageView {
 		this.pen.setStrokeCap(Paint.Cap.ROUND);
 		this.pen.setStrokeJoin(Paint.Join.ROUND);
 		this.pen.setStrokeWidth(10.0f);
+		this.name = "";
 	}
 
-	public ArrayList<Path> getPaths(){
-		return paths;
+	public String getName(){
+		return name;
+	}
+
+	public void setName(String name){
+		this.name = name;
 	}
 
 	// Purpose: This method is called when the object is touched. (Someone is attempting to draw.)
