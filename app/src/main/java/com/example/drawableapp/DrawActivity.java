@@ -15,8 +15,6 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-public class DrawActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener {
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -25,7 +23,8 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
-public class DrawActivity extends AppCompatActivity {
+public class DrawActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener {
+
 	private Art art;
 	private boolean penDialog = true;
 	private ImageButton penButton;
@@ -109,7 +108,7 @@ public class DrawActivity extends AppCompatActivity {
 		}
 	}
 
-	private void saveArtDialog(){
+	private void saveProjectDialog(){
 		Dialog dialog = new Dialog(this);
 		dialog.setContentView(R.layout.view_save_project);
 
@@ -120,7 +119,13 @@ public class DrawActivity extends AppCompatActivity {
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				dialog.dismiss();
+				String name = nameEditText.getText().toString();
+
+				if(!name.isEmpty()) {
+					art.setName(name);
+					uploadImage(name);
+					dialog.dismiss();
+				}
 			}
 		});
 		cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -170,24 +175,6 @@ public class DrawActivity extends AppCompatActivity {
 			}
 		});
 	}
-
-	public void deleteProject(String name){
-		StorageReference projectRef = storageRef.child(name +".jpg");
-
-// Delete the file
-		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-			@Override
-			public void onSuccess(Void aVoid) {
-				// File deleted successfully
-			}
-		}).addOnFailureListener(new OnFailureListener() {
-			@Override
-			public void onFailure(@NonNull Exception exception) {
-				// Uh-oh, an error occurred!
-			}
-		});
-	}
-
 
 	public void setNameExist(String name){
 
