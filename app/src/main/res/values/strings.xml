@@ -1,8 +1,18 @@
 <resources>
-	<string name="app_name">Drawable App</string>
+	<string name="app_name">Drawable</string>
 	<string name="section">Gallery</string>
 	<string name="color_picker_create">Please select a canvas color</string>
 	<string name="color_picker_alter">Pick a new color</string>
 	<string name="size_seeker_title">Set the pen size</string>
+	<string name="nav_open">Open</string>
+	<string name="nav_close">Close</string>
+	<string name="nav_new">NEW PROJECT</string>
+	<string name="nav_save">SAVE</string>
+	<string name="nav_load">LOAD</string>
+	<string name="nav_export">EXPORT PROJECT</string>
+	<string name="nav_import">IMPORT PROJECT</string>
+	<string name="action_undo">Undo</string>
+	<string name="action_redo">Redo</string>
+	<string name="action_share">Share</string>
 </resources>
 

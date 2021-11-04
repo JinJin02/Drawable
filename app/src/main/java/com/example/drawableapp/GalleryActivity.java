@@ -12,7 +12,7 @@ public class GalleryActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Hide the app label.
+		// Hide the top app bar.
 		this.getSupportActionBar().hide();
 
 		this.setContentView(R.layout.activity_gallery);

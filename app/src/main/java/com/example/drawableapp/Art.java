@@ -176,5 +176,17 @@ public class Art extends ImageView {
 	public int getBackgroundColor() {
 		return this.backgroundColor;
 	}
+
+	public void reset(int color) {
+		this.colors.clear();
+		this.sizes.clear();
+		this.paths.clear();
+		this.backgroundColor = color;
+		this.penColor = 0xff000000;
+		this.penSize = 12.0f;
+		this.erasing = false;
+
+		this.invalidate();
+	}
 }
 
