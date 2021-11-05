@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -20,6 +21,7 @@ public class Art extends ImageView {
 	private ArrayList<Integer> colors = new ArrayList<Integer>();
 	private ArrayList<Float> sizes = new ArrayList<Float>();
 	private ArrayList<Path> paths = new ArrayList<Path>();
+	private ArrayList<Path> undo = new ArrayList<Path>();
 	private int backgroundColor = 0xffffffff; // White!
 	private int penColor = 0xff000000; // Black! This variable is used to toggle pen/eraser mode.
 	private float penSize = 12.0f;
@@ -197,6 +199,29 @@ public class Art extends ImageView {
 		this.erasing = false;
 
 		this.invalidate();
+	}
+
+	public void undo() {
+
+		if (paths.size() != 0) {
+			undo.add(paths.remove(paths.size()-1));  //undo drawing
+			invalidate();                                  //means the canvas redraws itself
+		} else {
+
+			Toast.makeText(getContext(),"Nothing to undo",Toast.LENGTH_LONG).show();
+		}
+	}
+
+	public void redo() {
+
+		if (undo.size() !=0) {
+
+			paths.add(undo.remove(undo.size() - 1));   //puts back undone drawing
+			invalidate();
+		} else {
+
+			Toast.makeText(getContext(),"Nothing to redo",Toast.LENGTH_LONG).show();
+		}
 	}
 }
 

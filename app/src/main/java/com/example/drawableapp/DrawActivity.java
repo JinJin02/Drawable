@@ -1,33 +1,56 @@
 package com.example.drawableapp;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class DrawActivity extends AppCompatActivity implements
 	ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener, NavigationView.OnNavigationItemSelectedListener {
 	private Art art;
-	private ImageButton penButton;
-	private ImageButton eraserButton;
-
+	private ImageButton penButton, eraserButton;
 	private DrawerLayout burgerRoot;
 	private ActionBarDrawerToggle burgerToggle;
 
+	FirebaseStorage storage = FirebaseStorage.getInstance();
+	StorageReference storageRef = storage.getReference();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -82,15 +105,15 @@ public class DrawActivity extends AppCompatActivity implements
 
 		switch (item.getItemId()) {
 			case R.id.action_undo:
-				// TO BE IMPLEMENTED!
+				art.undo();
 				System.out.println("R.id.action_undo");
 				return true;
 			case R.id.action_redo:
-				// TO BE IMPLEMENTED!
+				art.redo();
 				System.out.println("R.id.action_redo");
 				return true;
 			case R.id.action_share:
-				// TO BE IMPLEMENTED!
+				share();
 				System.out.println("R.id.action_share");
 				return true;
 		}
@@ -105,7 +128,7 @@ public class DrawActivity extends AppCompatActivity implements
 				ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
 				break;
 			case R.id.nav_save:
-				saveArtDialog();
+				saveProjectDialog();
 				break;
 			case R.id.nav_load:
 				Intent intent = new Intent(this, GalleryActivity.class);
@@ -118,6 +141,12 @@ public class DrawActivity extends AppCompatActivity implements
 			case R.id.nav_import:
 				// TO BE IMPLEMENTED!
 				System.out.println("R.id.nav_import");
+				break;
+			case R.id.nav_delete:
+				// TO BE IMPLEMENTED!
+				if(!art.getName().isEmpty()){
+					deleteProjectDialog(art.getName());
+				}
 				break;
 		}
 
@@ -169,18 +198,30 @@ public class DrawActivity extends AppCompatActivity implements
 		}
 	}
 
-	private void saveArtDialog(){
+	private void saveProjectDialog(){
 		Dialog dialog = new Dialog(this);
 		dialog.setContentView(R.layout.view_save_project);
-		dialog.setCanceledOnTouchOutside(false);
 
 		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
 		Button saveBtn = dialog.findViewById(R.id.save_button);
+		EditText nameEditText = dialog.findViewById(R.id.name_edit_text);
 
 		saveBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				dialog.dismiss();
+				String name = nameEditText.getText().toString();
+
+				if(!name.isEmpty()) {
+					art.setName(name);
+					//nameTextView.setText(name);
+					uploadImage(name);
+					dialog.dismiss();
+				} else {
+					Toast toast = Toast.makeText(getApplicationContext(), "Please enter a name!", Toast.LENGTH_LONG);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+				}
+
 			}
 		});
 		cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -191,6 +232,149 @@ public class DrawActivity extends AppCompatActivity implements
 		});
 
 		dialog.show();
+	}
+
+	public void uploadImage(String name){
+		// For creating the file
+		//StorageReference fileRef = storageRef.child(userID + "/");
+		//StorageReference projectRef = fileRef.child(name + ".jpg");
+
+		StorageReference projectRef = storageRef.child(name + ".jpg");
+
+		//ändra art viewn till en jpeg
+		art.setDrawingCacheEnabled(true);
+		art.buildDrawingCache();
+
+		Bitmap bitmap = art.getDrawingCache();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		byte[] data = baos.toByteArray();
+
+
+		//ladda upp bilden
+		UploadTask uploadTask = projectRef.putBytes(data);
+		uploadTask.addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				// Handle unsuccessful uploads
+				Log.i("info",exception.getMessage());
+			}
+		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+			@Override
+			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+				baos.reset();
+				Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+				// ...
+				art.setDrawingCacheEnabled(false);
+			}
+		});
+	}
+
+	public void doesNameExist(String name){
+
+		StorageReference projectRef = storageRef.child(name + ".jpg");
+		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+			@Override
+			public void onSuccess(Uri uri) {
+				Log.i("info","file exist");
+
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+
+				Log.i("info","file not found");
+
+			}
+		});
+	}
+
+	public void deleteProjectDialog(String name){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		//Setting message manually and performing action on button click
+		builder.setMessage("Do you want to delete this project?")
+				.setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						deleteProject(name);
+						Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+								Toast.LENGTH_SHORT).show();
+						recreate();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						//  Action for 'NO' Button
+						dialog.cancel();
+						Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
+								Toast.LENGTH_SHORT).show();
+					}
+				});
+		//Creating dialog box
+		AlertDialog alert = builder.create();
+		//Setting the title manually
+
+		alert.show();
+	}
+
+	public void deleteProject(String name){
+
+		StorageReference projectRef = storageRef.child(name +".jpg");
+
+// Delete the file
+		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+			@Override
+			public void onSuccess(Void aVoid) {
+				Log.i("info", "it worked");
+
+				/*art = (Art) findViewById(R.id.art);
+				nameTextView = (TextView) findViewById(R.id.name_text_view);
+				art.setName("");*/
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+				Log.i("info", "uh-oh");
+			}
+		});
+	}
+
+	private void share() {
+		Bitmap bitmap = getBitmapFromView(art);
+		Intent share = new Intent(Intent.ACTION_SEND);
+		share.setType("Image/png");
+		ByteArrayOutputStream bytes =new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG,100,bytes);
+		String filePath = Environment.getExternalStorageDirectory()+ File.separator + "temporary_file.jpg";
+		File f = new File (filePath);
+		try {
+			f.createNewFile();
+			FileOutputStream fo =new FileOutputStream(f);
+			fo.write(bytes.toByteArray());
+
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		share.putExtra(Intent.EXTRA_STREAM,Uri.parse(filePath));
+		startActivity(Intent.createChooser(share,"Share Image"));
+	}
+
+	private Bitmap getBitmapFromView(View view) {
+		Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(returnedBitmap);
+		Drawable bgDrawable =view.getBackground();
+		if (bgDrawable!=null) {
+			//has background drawable, then draw it on the canvas
+			bgDrawable.draw(canvas);
+		}   else{
+			//does not have background drawable, then draw white background on the canvas
+			canvas.drawColor(Color.WHITE);
+		}
+		view.draw(canvas);
+		return returnedBitmap;
 	}
 
 	public void showColorPickerPen(View view) {
