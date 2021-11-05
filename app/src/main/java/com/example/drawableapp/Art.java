@@ -1,6 +1,9 @@
 package com.example.drawableapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.graphics.Canvas;
 import android.graphics.Path;
@@ -18,7 +21,7 @@ public class Art extends ImageView {
 	private Paint pen = new Paint();
 	private Path path;
 	private ArrayList<Path> paths = new ArrayList<Path>();
-	private ArrayList<Path> undonePaths = new ArrayList<Path>();
+	private ArrayList<Path> undo = new ArrayList<Path>();
 	private ArrayList<Integer> colors = new ArrayList<Integer>();
 	private int backgroundColor = 0xffffffff; // White!
 	private int penColor = 0xff000000; // Black! This variable is needed to toggle pen/eraser mode.
@@ -110,9 +113,9 @@ public class Art extends ImageView {
 
 	public void undo() {
 
-		if (paths.size() > 0) {
-			paths.add(paths.remove(paths.size()-1));
-			invalidate();         //means the canvas redraws itself
+		if (paths.size() != 0) {
+			undo.add(paths.remove(paths.size()-1));  //undo drawing
+			invalidate();                                  //means the canvas redraws itself
 		} else {
 
 			Toast.makeText(getContext(),"Nothing to undo",Toast.LENGTH_LONG).show();
@@ -121,15 +124,15 @@ public class Art extends ImageView {
 
 	public void redo() {
 
-		if (undonePaths.size()>0) {
-			paths.add(undonePaths.remove(undonePaths.size()-1));
+		if (undo.size() !=0) {
+
+			paths.add(undo.remove(undo.size() - 1));   //puts back undone drawing
 			invalidate();
 		} else {
 
 			Toast.makeText(getContext(),"Nothing to redo",Toast.LENGTH_LONG).show();
 		}
 	}
-
 
 }
 

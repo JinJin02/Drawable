@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,15 +40,6 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-		switch (item.getItemId()){
-			case R.id.undoButton:
-
-		}
-		return super.onOptionsItemSelected(item);
 	}
 }
 
