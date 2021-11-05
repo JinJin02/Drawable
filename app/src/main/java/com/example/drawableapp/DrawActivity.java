@@ -6,9 +6,11 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -30,6 +32,10 @@ import com.google.firebase.storage.UploadTask;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class DrawActivity extends AppCompatActivity implements ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener {
 
@@ -41,6 +47,7 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 	private ImageButton deleteButton;
 	private TextView nameTextView;
 
+	FileOutputStream outputStream;
 
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
@@ -61,9 +68,13 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		this.deleteButton = (ImageButton) this.findViewById(R.id.delete_button);
 		this.nameTextView = (TextView) this.findViewById(R.id.name_text_view);
 
+
+
+
 		this.drawSizeImageDot(this.art.getPenSize());
 
 		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
+
 		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -88,6 +99,26 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 			}
 		});
+
+
+		backButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				//kollar om project redan har ett namn och sparar isåfall över den filen
+				//annars öppnar den en dialog för att spara ett projekt för första gången
+				if(art.getName().isEmpty()){
+					saveProjectLocallyDialog();
+				} else {
+					Log.i("info", art.getName());
+					uploadImage(art.getName());
+				}
+
+			}
+		});
+
+
+
 
 		deleteButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -138,6 +169,8 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 		dialog.setContentView(R.layout.view_save_project);
 
 		Button cancelBtn = dialog.findViewById(R.id.cancel_button);
+		Button saveBtnLocally = dialog.findViewById(R.id.save_button_locally);
+
 		Button saveBtn = dialog.findViewById(R.id.save_button);
 		EditText nameEditText = dialog.findViewById(R.id.name_edit_text);
 
@@ -158,6 +191,43 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 			}
 		});
+
+		saveBtnLocally.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+
+
+				BitmapDrawable drawable = (BitmapDrawable) art.getDrawable();
+				Bitmap bitmap = drawable.getBitmap();
+
+				File filepath = Environment.getExternalStorageDirectory();
+				File dir = new File(filepath.getAbsolutePath()+"/Demo/");
+				dir.mkdir();
+				File file = new File(dir,System.currentTimeMillis()+ " .jpg");
+				try {
+					outputStream = new FileOutputStream(file);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				bitmap.compress(Bitmap.CompressFormat.JPEG,100, outputStream);
+				Toast.makeText(getApplicationContext(),"image saved to internal storage"
+				, Toast.LENGTH_SHORT).show();
+				try {
+					outputStream.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+
+			}
+		});
+
+
 		cancelBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -167,6 +237,45 @@ public class DrawActivity extends AppCompatActivity implements ColorPicker.Color
 
 		dialog.show();
 	}
+
+	private void saveProjectLocallyDialog(){
+		Dialog dialog = new Dialog(this);
+		dialog.setContentView(R.layout.view_save_locally);
+
+		Button noBtn = dialog.findViewById(R.id.refuse_button);
+		Button yesBtn = dialog.findViewById(R.id.verify_button);
+		EditText nameEditText = dialog.findViewById(R.id.name_edit_text);
+
+		yesBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				String name = nameEditText.getText().toString();
+
+				if(!name.isEmpty()) {
+					art.setName(name);
+					nameTextView.setText(name);
+					uploadImage(name);
+					dialog.dismiss();
+				}
+				Toast toast=Toast.makeText(getApplicationContext(),"Please enter a name!",Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+
+			}
+		});
+		noBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				dialog.dismiss();
+			}
+		});
+
+		dialog.show();
+	}
+
+
+
+
 
 	public void deleteProjectDialog(String name){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
