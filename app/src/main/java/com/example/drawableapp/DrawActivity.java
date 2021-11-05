@@ -108,8 +108,8 @@ public class DrawActivity extends AppCompatActivity implements
 				saveArtDialog();
 				break;
 			case R.id.nav_load:
-				// TO BE IMPLEMENTED!
-				System.out.println("R.id.nav_load");
+				Intent intent = new Intent(this, GalleryActivity.class);
+				startActivity(intent);
 				break;
 			case R.id.nav_export:
 				// TO BE IMPLEMENTED!

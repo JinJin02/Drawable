@@ -21,9 +21,7 @@ public class GalleryActivity extends AppCompatActivity {
 		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(GalleryActivity.this, MainActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				finish();
 			}
 		});
 	}

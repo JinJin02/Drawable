@@ -77,17 +77,6 @@ public class ColorPicker {
 
 		// The dialog:
 		this.dialog = new Dialog(this.context);
-		int title = 0;
-		switch (this.dialogMode) {
-			case CREATE:
-				title = R.string.color_picker_create;
-				break;
-			case ALTER_PEN:
-			case ALTER_BACKGROUND:
-				title = R.string.color_picker_alter;
-				break;
-		}
-		this.dialog.setTitle(title);
 		this.dialog.setCanceledOnTouchOutside(false);
 		this.dialog.getWindow().setBackgroundDrawable(this.makeBackgroundShape(0, 0xffcfcfcf));
 
@@ -209,12 +198,22 @@ public class ColorPicker {
 			return;
 		}
 
-		this.dialogMode = mode;
-
 		// If this is called from a different activity, create a new dialog.
 		if (context != this.context) {
 			this.context = context;
 			this.createDialog();
+		}
+
+		this.dialogMode = mode;
+
+		switch (this.dialogMode) {
+			case CREATE:
+				this.dialog.setTitle(R.string.color_picker_create);
+				break;
+			case ALTER_PEN:
+			case ALTER_BACKGROUND:
+				this.dialog.setTitle(R.string.color_picker_alter);
+				break;
 		}
 
 		try {
