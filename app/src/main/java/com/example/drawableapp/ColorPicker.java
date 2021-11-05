@@ -19,7 +19,7 @@ public class ColorPicker {
 	private ColorPickerListener listener;
 	private Context context;
 	private Dialog dialog;
-	private ColorPicker.Mode dialogMode;
+	private Mode dialogMode;
 	private final int[] buttonColors = {
 		0xff000000, 0xff7f7f7f, 0xffffffff, 0xffff0000, 0xffff7f00,
 		0xffffff00, 0xff7fff00, 0xff00ff00, 0xff00ff7f, 0xff00ffff,
@@ -30,12 +30,12 @@ public class ColorPicker {
 	private int cornerRadius;
 
 	// Purpose: This enumerator is used to select the mode/style of the generated dialog.
-	public enum Mode {CREATE, ALTER}
+	public enum Mode {CREATE, ALTER_PEN, ALTER_BACKGROUND}
 
 	// Purpose: The interface's purpose is to force the calling activity to implement callback
 	// methods.
 	public interface ColorPickerListener {
-		public void onColorPickerOkClick(int pickedColor);
+		public void onColorPickerOkClick(Mode mode, int pickedColor);
 	}
 
 	// Purpose: Constructor!
@@ -77,16 +77,6 @@ public class ColorPicker {
 
 		// The dialog:
 		this.dialog = new Dialog(this.context);
-		int title = 0;
-		switch (this.dialogMode) {
-			case CREATE:
-				title = R.string.color_picker_create;
-				break;
-			case ALTER:
-				title = R.string.color_picker_alter;
-				break;
-		}
-		this.dialog.setTitle(title);
 		this.dialog.setCanceledOnTouchOutside(false);
 		this.dialog.getWindow().setBackgroundDrawable(this.makeBackgroundShape(0, 0xffcfcfcf));
 
@@ -110,7 +100,7 @@ public class ColorPicker {
 		okButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				listener.onColorPickerOkClick((int) (dialog.findViewById(pickedId)).getTag());
+				listener.onColorPickerOkClick(dialogMode, (int) (dialog.findViewById(pickedId)).getTag());
 				dialog.dismiss();
 			}
 		});
@@ -201,19 +191,29 @@ public class ColorPicker {
 	// Purpose: Use this method to open/create a dialog window.
 	// Arguments: Context context, ColorPicker.Mode mode, int currentColor
 	// Returns: -
-	public void show(Context context, ColorPicker.Mode mode, int currentColor) {
+	public void show(Context context, Mode mode, int currentColor) {
 		// If no colors are defined, this class won't work. On the other hand, it won't work without
 		// a bunch of other information and I'm only checking this, so …
 		if (this.buttonColors.length == 0) {
 			return;
 		}
 
-		this.dialogMode = mode;
-
 		// If this is called from a different activity, create a new dialog.
 		if (context != this.context) {
 			this.context = context;
 			this.createDialog();
+		}
+
+		this.dialogMode = mode;
+
+		switch (this.dialogMode) {
+			case CREATE:
+				this.dialog.setTitle(R.string.color_picker_create);
+				break;
+			case ALTER_PEN:
+			case ALTER_BACKGROUND:
+				this.dialog.setTitle(R.string.color_picker_alter);
+				break;
 		}
 
 		try {
