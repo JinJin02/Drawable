@@ -63,16 +63,6 @@ public class DrawActivity extends AppCompatActivity implements
 
 		this.drawSizeImageDot(this.art.getPenSize());
 
-//		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
-//		backButton.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View view) {
-//				Intent intent = new Intent(DrawActivity.this, MainActivity.class);
-//				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//				startActivity(intent);
-//			}
-//		});
-
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
 			this.art.setBackgroundColor(bundle.getInt("BACKGROUND_COLOR"));
