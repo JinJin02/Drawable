@@ -1,16 +1,21 @@
 package com.example.drawableapp;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +27,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.Menu;
@@ -49,8 +55,10 @@ public class DrawActivity extends AppCompatActivity implements
 	private DrawerLayout burgerRoot;
 	private ActionBarDrawerToggle burgerToggle;
 
+
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,6 +86,9 @@ public class DrawActivity extends AppCompatActivity implements
 		navigationView.setNavigationItemSelectedListener(this);
 
 		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		/*art.setImageURI(filepath);*/
+
 	}
 
 	@Override
@@ -134,7 +145,7 @@ public class DrawActivity extends AppCompatActivity implements
 				break;
 			case R.id.nav_delete:
 				// TO BE IMPLEMENTED!
-				if(!art.getName().isEmpty()){
+				if (!art.getName().isEmpty()) {
 					deleteProjectDialog(art.getName());
 				}
 				break;
@@ -188,7 +199,7 @@ public class DrawActivity extends AppCompatActivity implements
 		}
 	}
 
-	private void saveProjectDialog(){
+	private void saveProjectDialog() {
 		Dialog dialog = new Dialog(this);
 		dialog.setContentView(R.layout.view_save_project);
 
@@ -201,7 +212,7 @@ public class DrawActivity extends AppCompatActivity implements
 			public void onClick(View view) {
 				String name = nameEditText.getText().toString();
 
-				if(!name.isEmpty()) {
+				if (!name.isEmpty()) {
 					art.setName(name);
 					//nameTextView.setText(name);
 					uploadImage(name);
@@ -224,7 +235,7 @@ public class DrawActivity extends AppCompatActivity implements
 		dialog.show();
 	}
 
-	public void uploadImage(String name){
+	public void uploadImage(String name) {
 		// For creating the file
 		//StorageReference fileRef = storageRef.child(userID + "/");
 		//StorageReference projectRef = fileRef.child(name + ".jpg");
@@ -247,13 +258,13 @@ public class DrawActivity extends AppCompatActivity implements
 			@Override
 			public void onFailure(@NonNull Exception exception) {
 				// Handle unsuccessful uploads
-				Log.i("info",exception.getMessage());
+				Log.i("info", exception.getMessage());
 			}
 		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 			@Override
 			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 				baos.reset();
-				Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+				Toast toast = Toast.makeText(getApplicationContext(), "Saved successfully!", Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.CENTER, 0, 0);
 				toast.show();
 				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
@@ -263,26 +274,26 @@ public class DrawActivity extends AppCompatActivity implements
 		});
 	}
 
-	public void doesNameExist(String name){
+	public void doesNameExist(String name) {
 
 		StorageReference projectRef = storageRef.child(name + ".jpg");
 		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 			@Override
 			public void onSuccess(Uri uri) {
-				Log.i("info","file exist");
+				Log.i("info", "file exist");
 
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
 
-				Log.i("info","file not found");
+				Log.i("info", "file not found");
 
 			}
 		});
 	}
 
-	public void deleteProjectDialog(String name){
+	public void deleteProjectDialog(String name) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		//Setting message manually and performing action on button click
 		builder.setMessage("Do you want to delete this project?")
@@ -290,7 +301,7 @@ public class DrawActivity extends AppCompatActivity implements
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						deleteProject(name);
-						Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
+						Toast.makeText(getApplicationContext(), "you choose yes action for alertbox",
 								Toast.LENGTH_SHORT).show();
 						recreate();
 					}
@@ -299,7 +310,7 @@ public class DrawActivity extends AppCompatActivity implements
 					public void onClick(DialogInterface dialog, int id) {
 						//  Action for 'NO' Button
 						dialog.cancel();
-						Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
+						Toast.makeText(getApplicationContext(), "you choose no action for alertbox",
 								Toast.LENGTH_SHORT).show();
 					}
 				});
@@ -310,9 +321,9 @@ public class DrawActivity extends AppCompatActivity implements
 		alert.show();
 	}
 
-	public void deleteProject(String name){
+	public void deleteProject(String name) {
 
-		StorageReference projectRef = storageRef.child(name +".jpg");
+		StorageReference projectRef = storageRef.child(name + ".jpg");
 
 // Delete the file
 		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -333,39 +344,28 @@ public class DrawActivity extends AppCompatActivity implements
 	}
 
 	private void share() {
-		Bitmap bitmap = getBitmapFromView(art);
-		Intent share = new Intent(Intent.ACTION_SEND);
-		share.setType("Image/png");
-		ByteArrayOutputStream bytes =new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG,100,bytes);
-		String filePath = Environment.getExternalStorageDirectory()+ File.separator + "temporary_file.jpg";
-		File f = new File (filePath);
-		try {
-			f.createNewFile();
-			FileOutputStream fo =new FileOutputStream(f);
-			fo.write(bytes.toByteArray());
+		StorageReference projectRef = storageRef.child("bongo.jpg");
+		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+			@Override
+			public void onSuccess(Uri uri) {
+				Intent shareIntent = new Intent();
+				shareIntent.setAction(Intent.ACTION_SEND);
+				shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+				shareIntent.setType("image/jpeg");
+				startActivity(Intent.createChooser(shareIntent, "Share"));
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
 
-		}catch (IOException e){
-			e.printStackTrace();
-		}
-		share.putExtra(Intent.EXTRA_STREAM,Uri.parse(filePath));
-		startActivity(Intent.createChooser(share,"Share Image"));
+				Toast.makeText(getApplicationContext(),"file not found",
+						Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
-	private Bitmap getBitmapFromView(View view) {
-		Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
-		Canvas canvas = new Canvas(returnedBitmap);
-		Drawable bgDrawable =view.getBackground();
-		if (bgDrawable!=null) {
-			//has background drawable, then draw it on the canvas
-			bgDrawable.draw(canvas);
-		}   else{
-			//does not have background drawable, then draw white background on the canvas
-			canvas.drawColor(Color.WHITE);
-		}
-		view.draw(canvas);
-		return returnedBitmap;
-	}
+
+
 
 	public void showColorPickerPen(View view) {
 		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_PEN, this.art.getPenColor());
