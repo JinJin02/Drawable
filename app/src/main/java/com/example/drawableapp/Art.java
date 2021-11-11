@@ -1,9 +1,12 @@
 package com.example.drawableapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,7 +17,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-public class Art extends ImageView {
+public class Art extends androidx.appcompat.widget.AppCompatImageView {
 	private String name;
 	private Paint pen = new Paint();
 	private Path path;
@@ -29,6 +32,8 @@ public class Art extends ImageView {
 	public static final float PEN_MIN_SIZE = 4.0f;
 	public static final float PEN_MAX_SIZE = 64.0f;
 
+	private Drawable mDrawable = null;
+	private BitmapDrawable mRecycleableBitmapDrawable = null;
 	// Purpose: Constructor!
 	// Arguments: Context context
 	public Art(Context context) {
@@ -223,5 +228,8 @@ public class Art extends ImageView {
 			Toast.makeText(getContext(),"Nothing to redo",Toast.LENGTH_LONG).show();
 		}
 	}
+
+
+
 }
 

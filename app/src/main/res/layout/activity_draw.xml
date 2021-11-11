@@ -8,49 +8,10 @@
 	android:layout_height="match_parent">
 
 	<androidx.constraintlayout.widget.ConstraintLayout
+		android:id="@+id/art_constraint"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-		<!-- androidx.constraintlayout.widget.ConstraintLayout
-			android:id="@+id/menuBar"
-			android:layout_width="match_parent"
-			android:layout_height="72dp"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent">
-
-			<ImageButton
-				android:id="@+id/saveButton"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:layout_marginEnd="12dp"
-				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintEnd_toStartOf="@+id/menuButton"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:srcCompat="@android:drawable/ic_menu_save" />
-
-			<ImageButton
-				android:id="@+id/backButton"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:layout_marginStart="12dp"
-				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				app:srcCompat="@android:drawable/ic_menu_revert" />
-
-			<ImageButton
-				android:id="@+id/menuButton"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:layout_marginEnd="12dp"
-				android:backgroundTint="#dfdfdf"
-				app:layout_constraintTop_toTopOf="parent"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:srcCompat="@drawable/ic_baseline_menu_24" />
-
-		</androidx.constraintlayout.widget.ConstraintLayout -->
 
 		<com.example.drawableapp.Art
 			android:id="@+id/art"
@@ -59,7 +20,8 @@
 			app:layout_constraintBottom_toTopOf="@+id/controlsBar"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent" />
+			app:layout_constraintTop_toTopOf="parent"
+			/>
 
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/controlsBar"

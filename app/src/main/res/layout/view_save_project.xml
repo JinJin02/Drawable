@@ -17,10 +17,9 @@
         >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,8 +33,9 @@
                     android:id="@+id/save_as_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal|center_vertical"
 
+                    android:fontFamily="serif"
                     android:text="Save as:"
                     android:textSize="20sp" />
 
@@ -45,6 +45,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
 
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="serif"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -54,24 +56,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="8dp"
-                android:gravity="center_horizontal"
+                android:gravity="right|center_horizontal"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/cancel_button"
+                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#F44336"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginLeft="24dp"
+                    android:fontFamily="serif"
                     android:text="Cancel"
                     android:textColor="@color/black" />
 
                 <Button
                     android:id="@+id/save_button"
+                    style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
 
+                    android:layout_marginStart="24dp"
                     android:layout_marginLeft="24dp"
+                    android:fontFamily="serif"
+                    android:gravity="center_vertical"
                     android:text="Save"
                     android:textColor="@color/black" />
 

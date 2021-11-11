@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements ColorPicker.Color
 //		drawActivityButton.setOnClickListener(new View.OnClickListener() {
 //			@Override
 //			public void onClick(View view) {
-//				ColorPicker.get().show(MainActivity.this, ColorPicker.Mode.CREATE, 0xffffffff);
+//				ColorPicker.get().show(MainActivity.this, ColorPicker.Mode.CREATE, 0xffffffff);z
 //			}
 //		});
 //

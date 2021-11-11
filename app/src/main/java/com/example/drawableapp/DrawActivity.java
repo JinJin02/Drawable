@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.Menu;
@@ -53,6 +55,9 @@ public class DrawActivity extends AppCompatActivity implements
 	private DrawerLayout burgerRoot;
 	private ActionBarDrawerToggle burgerToggle;
 	private ActionBar actionbar;
+	private ResetAction resetAction;
+
+	public enum ResetAction {NEW_PROJECT, DELETE_PROJECT}
 
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
@@ -71,10 +76,14 @@ public class DrawActivity extends AppCompatActivity implements
 
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
+			ConstraintLayout test = findViewById(R.id.art_constraint);
 			this.art.setBackgroundColor(bundle.getInt("BACKGROUND_COLOR"));
 			this.art.setName(bundle.getString("IMAGE_NAME"));
 			getSupportActionBar().setTitle(bundle.getString("IMAGE_NAME"));
-			//Glide.with(this.getContext()).load(bundle.getString("IMAGE_URL")).into(art);
+			Bitmap b = BitmapFactory.decodeByteArray(
+					getIntent().getByteArrayExtra("byteArray"),0,getIntent().getByteArrayExtra("byteArray").length);
+			this.art.setImageBitmap(b);
+			Glide.with(test.getContext()).load(bundle.getString("IMAGE_URL")).into(art);
 		}
 
 		this.burgerRoot = this.findViewById(R.id.burger_root);
@@ -112,10 +121,7 @@ public class DrawActivity extends AppCompatActivity implements
 				System.out.println("R.id.action_redo");
 				return true;
 			case R.id.action_share:
-
-					share();
-
-				System.out.println("R.id.action_share");
+				share();
 				return true;
 		}
 
@@ -126,9 +132,8 @@ public class DrawActivity extends AppCompatActivity implements
 	public boolean onNavigationItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.nav_new:
-				resetProject();
-				//art.setName("");
-				//ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
+				resetProjectDialog(ResetAction.NEW_PROJECT);
+
 				break;
 			case R.id.nav_save:
 				if(art.getName().isEmpty()){
@@ -142,9 +147,9 @@ public class DrawActivity extends AppCompatActivity implements
 				startActivity(intent);
 				break;
 			case R.id.nav_delete:
-				// TO BE IMPLEMENTED!
+
 				if(!art.getName().isEmpty()){
-					deleteProjectDialog(art.getName());
+					resetProjectDialog(ResetAction.DELETE_PROJECT);
 				}
 				break;
 		}
@@ -236,7 +241,9 @@ public class DrawActivity extends AppCompatActivity implements
 		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 			@Override
 			public void onSuccess(Uri uri) {
-				Log.i("info","file exist");
+				Toast toast = Toast.makeText(getApplicationContext(), "This name already exists", Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
 
 			}
 		}).addOnFailureListener(new OnFailureListener() {
@@ -274,7 +281,9 @@ public class DrawActivity extends AppCompatActivity implements
 					@Override
 					public void onFailure(@NonNull Exception exception) {
 						// Handle unsuccessful uploads
-						Log.i("info",exception.getMessage());
+						Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
+						toast.setGravity(Gravity.CENTER, 0, 0);
+						toast.show();
 					}
 				}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 					@Override
@@ -293,19 +302,34 @@ public class DrawActivity extends AppCompatActivity implements
 
 	}
 
-	public void deleteProjectDialog(String name){
+	public void resetProjectDialog(ResetAction resetAction){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		//Setting message manually and performing action on button click
-		builder.setMessage("Do you want to delete this project?")
-				.setCancelable(false)
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						deleteProject(name);
-						dialog.cancel();
+		this.resetAction = resetAction;
 
-					}
-				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		switch (this.resetAction) {
+			case NEW_PROJECT:
+				builder.setMessage(R.string.reset_action_new).setCancelable(false)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								resetProject();
+								dialog.cancel();
+
+							}
+						});
+				break;
+			case DELETE_PROJECT:
+				builder.setMessage(R.string.reset_action_delete).setCancelable(false)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								deleteProject();
+								dialog.cancel();
+
+							}
+						});
+				break;
+		}
+		builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						//  Action for 'NO' Button
 						dialog.cancel();
@@ -319,29 +343,33 @@ public class DrawActivity extends AppCompatActivity implements
 		alert.show();
 	}
 
-	public void deleteProject(String name){
+	public void deleteProject(){
 
-		StorageReference projectRef = storageRef.child(name +".jpg");
+		StorageReference projectRef = storageRef.child(art.getName() +".jpg");
 		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
 			@Override
 			public void onSuccess(Void aVoid) {
-				Toast.makeText(getApplicationContext(),"Deleted succesfully!",
-						Toast.LENGTH_LONG).show();
 				resetProject();
+				Toast toast = Toast.makeText(getApplicationContext(), "Deleted succesfully!", Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
+
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
-				Log.i("info", "uh-oh");
+				Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
 			}
 		});
 	}
 
 	public void resetProject(){
-		art.setName("");
-		getSupportActionBar().setTitle("");
+		this.art.reset(0xffffffff);
+		this.art.setName("");
+		getSupportActionBar().setTitle(this.art.getName());
 		ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
-
 	}
 
 	private void share(){
@@ -356,14 +384,13 @@ public class DrawActivity extends AppCompatActivity implements
 				shareIntent.setType("image/jpeg");
 				startActivity(Intent.createChooser(shareIntent, "Share"));
 
-
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
-
-				Toast.makeText(getApplicationContext(),"file not found",
-						Toast.LENGTH_SHORT).show();
+				Toast toast = Toast.makeText(getApplicationContext(), "Please save project!", Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.show();
 
 			}
 		});
