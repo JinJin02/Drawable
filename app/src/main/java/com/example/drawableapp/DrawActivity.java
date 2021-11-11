@@ -1,5 +1,6 @@
 package com.example.drawableapp;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,9 +29,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -41,6 +44,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 
 public class DrawActivity extends AppCompatActivity implements
 	ColorPicker.ColorPickerListener, SizeSeeker.SizeSeekerListener, NavigationView.OnNavigationItemSelectedListener {
@@ -48,6 +52,7 @@ public class DrawActivity extends AppCompatActivity implements
 	private ImageButton penButton, eraserButton;
 	private DrawerLayout burgerRoot;
 	private ActionBarDrawerToggle burgerToggle;
+	private ActionBar actionbar;
 
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
@@ -57,6 +62,7 @@ public class DrawActivity extends AppCompatActivity implements
 
 		this.setContentView(R.layout.activity_draw);
 
+		getSupportActionBar().setTitle("");
 		this.art = (Art) this.findViewById(R.id.art);
 		this.penButton = (ImageButton) this.findViewById(R.id.penButton);
 		this.eraserButton = (ImageButton) this.findViewById(R.id.eraserButton);
@@ -66,6 +72,9 @@ public class DrawActivity extends AppCompatActivity implements
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
 			this.art.setBackgroundColor(bundle.getInt("BACKGROUND_COLOR"));
+			this.art.setName(bundle.getString("IMAGE_NAME"));
+			getSupportActionBar().setTitle(bundle.getString("IMAGE_NAME"));
+			//Glide.with(this.getContext()).load(bundle.getString("IMAGE_URL")).into(art);
 		}
 
 		this.burgerRoot = this.findViewById(R.id.burger_root);
@@ -103,7 +112,9 @@ public class DrawActivity extends AppCompatActivity implements
 				System.out.println("R.id.action_redo");
 				return true;
 			case R.id.action_share:
-				share();
+
+					share();
+
 				System.out.println("R.id.action_share");
 				return true;
 		}
@@ -115,22 +126,20 @@ public class DrawActivity extends AppCompatActivity implements
 	public boolean onNavigationItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.nav_new:
-				ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
+				resetProject();
+				//art.setName("");
+				//ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
 				break;
 			case R.id.nav_save:
-				saveProjectDialog();
+				if(art.getName().isEmpty()){
+					saveProjectDialog();
+				} else {
+					uploadImage(art.getName());
+				}
 				break;
-			case R.id.nav_load:
+			case R.id.nav_open_gallery:
 				Intent intent = new Intent(this, GalleryActivity.class);
 				startActivity(intent);
-				break;
-			case R.id.nav_export:
-				// TO BE IMPLEMENTED!
-				System.out.println("R.id.nav_export");
-				break;
-			case R.id.nav_import:
-				// TO BE IMPLEMENTED!
-				System.out.println("R.id.nav_import");
 				break;
 			case R.id.nav_delete:
 				// TO BE IMPLEMENTED!
@@ -202,9 +211,7 @@ public class DrawActivity extends AppCompatActivity implements
 				String name = nameEditText.getText().toString();
 
 				if(!name.isEmpty()) {
-					art.setName(name);
-					//nameTextView.setText(name);
-					uploadImage(name);
+					checkIfNameTaken(name);
 					dialog.dismiss();
 				} else {
 					Toast toast = Toast.makeText(getApplicationContext(), "Please enter a name!", Toast.LENGTH_LONG);
@@ -224,47 +231,7 @@ public class DrawActivity extends AppCompatActivity implements
 		dialog.show();
 	}
 
-	public void uploadImage(String name){
-		// For creating the file
-		//StorageReference fileRef = storageRef.child(userID + "/");
-		//StorageReference projectRef = fileRef.child(name + ".jpg");
-
-		StorageReference projectRef = storageRef.child(name + ".jpg");
-
-		//ändra art viewn till en jpeg
-		art.setDrawingCacheEnabled(true);
-		art.buildDrawingCache();
-
-		Bitmap bitmap = art.getDrawingCache();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-		byte[] data = baos.toByteArray();
-
-
-		//ladda upp bilden
-		UploadTask uploadTask = projectRef.putBytes(data);
-		uploadTask.addOnFailureListener(new OnFailureListener() {
-			@Override
-			public void onFailure(@NonNull Exception exception) {
-				// Handle unsuccessful uploads
-				Log.i("info",exception.getMessage());
-			}
-		}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-			@Override
-			public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-				baos.reset();
-				Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
-				toast.show();
-				// taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-				// ...
-				art.setDrawingCacheEnabled(false);
-			}
-		});
-	}
-
-	public void doesNameExist(String name){
-
+	public void checkIfNameTaken(String name){
 		StorageReference projectRef = storageRef.child(name + ".jpg");
 		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 			@Override
@@ -276,10 +243,54 @@ public class DrawActivity extends AppCompatActivity implements
 			@Override
 			public void onFailure(@NonNull Exception exception) {
 
-				Log.i("info","file not found");
+				uploadImage(name);
 
 			}
 		});
+
+	}
+
+	public void uploadImage(String name){
+		// For creating the file
+		//StorageReference fileRef = storageRef.child(userID + "/");
+		//StorageReference projectRef = fileRef.child(name + ".jpg");
+
+
+		StorageReference projectRef = storageRef.child(name + ".jpg");
+				//ändra art viewn till en jpeg
+				art.setDrawingCacheEnabled(true);
+				art.buildDrawingCache();
+				Bitmap bitmap = art.getDrawingCache();
+
+				//bitmap = getBitmapFromView(art);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+				byte[] data = baos.toByteArray();
+
+
+				//ladda upp bilden
+				UploadTask uploadTask = projectRef.putBytes(data);
+				uploadTask.addOnFailureListener(new OnFailureListener() {
+					@Override
+					public void onFailure(@NonNull Exception exception) {
+						// Handle unsuccessful uploads
+						Log.i("info",exception.getMessage());
+					}
+				}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+					@Override
+					public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+							//baos.reset();
+
+							Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+							toast.setGravity(Gravity.CENTER, 0, 0);
+							toast.show();
+							art.setName(name);
+							getSupportActionBar().setTitle(name);
+							art.setDrawingCacheEnabled(false);
+					}
+				});
+
+
 	}
 
 	public void deleteProjectDialog(String name){
@@ -290,17 +301,15 @@ public class DrawActivity extends AppCompatActivity implements
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						deleteProject(name);
-						Toast.makeText(getApplicationContext(),"you choose yes action for alertbox",
-								Toast.LENGTH_SHORT).show();
-						recreate();
+						dialog.cancel();
+
 					}
 				})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						//  Action for 'NO' Button
 						dialog.cancel();
-						Toast.makeText(getApplicationContext(),"you choose no action for alertbox",
-								Toast.LENGTH_SHORT).show();
+
 					}
 				});
 		//Creating dialog box
@@ -313,16 +322,12 @@ public class DrawActivity extends AppCompatActivity implements
 	public void deleteProject(String name){
 
 		StorageReference projectRef = storageRef.child(name +".jpg");
-
-// Delete the file
 		projectRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
 			@Override
 			public void onSuccess(Void aVoid) {
-				Log.i("info", "it worked");
-
-				/*art = (Art) findViewById(R.id.art);
-				nameTextView = (TextView) findViewById(R.id.name_text_view);
-				art.setName("");*/
+				Toast.makeText(getApplicationContext(),"Deleted succesfully!",
+						Toast.LENGTH_LONG).show();
+				resetProject();
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
@@ -332,24 +337,36 @@ public class DrawActivity extends AppCompatActivity implements
 		});
 	}
 
-	private void share() {
-		Bitmap bitmap = getBitmapFromView(art);
-		Intent share = new Intent(Intent.ACTION_SEND);
-		share.setType("Image/png");
-		ByteArrayOutputStream bytes =new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG,100,bytes);
-		String filePath = Environment.getExternalStorageDirectory()+ File.separator + "temporary_file.jpg";
-		File f = new File (filePath);
-		try {
-			f.createNewFile();
-			FileOutputStream fo =new FileOutputStream(f);
-			fo.write(bytes.toByteArray());
+	public void resetProject(){
+		art.setName("");
+		getSupportActionBar().setTitle("");
+		ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
 
-		}catch (IOException e){
-			e.printStackTrace();
-		}
-		share.putExtra(Intent.EXTRA_STREAM,Uri.parse(filePath));
-		startActivity(Intent.createChooser(share,"Share Image"));
+	}
+
+	private void share(){
+
+		StorageReference projectRef = storageRef.child(art.getName() + ".jpg");
+		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+			@Override
+			public void onSuccess(Uri uri) {
+				Intent shareIntent = new Intent();
+				shareIntent.setAction(Intent.ACTION_SEND);
+				shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+				shareIntent.setType("image/jpeg");
+				startActivity(Intent.createChooser(shareIntent, "Share"));
+
+
+			}
+		}).addOnFailureListener(new OnFailureListener() {
+			@Override
+			public void onFailure(@NonNull Exception exception) {
+
+				Toast.makeText(getApplicationContext(),"file not found",
+						Toast.LENGTH_SHORT).show();
+
+			}
+		});
 	}
 
 	private Bitmap getBitmapFromView(View view) {
@@ -366,6 +383,7 @@ public class DrawActivity extends AppCompatActivity implements
 		view.draw(canvas);
 		return returnedBitmap;
 	}
+
 
 	public void showColorPickerPen(View view) {
 		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_PEN, this.art.getPenColor());

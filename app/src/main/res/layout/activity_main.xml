@@ -33,62 +33,7 @@
 		app:layout_constraintVertical_bias="0.95"
 		app:srcCompat="@drawable/ic_baseline_palette_24" />
 
-	<!-- TextView
-		android:id="@+id/titleTextView"
-		android:layout_width="277dp"
-		android:layout_height="120dp"
-		android:background="#00FFFFFF"
-		android:fontFamily="serif"
-		android:text="DRAWABLE"
-		android:textColor="#FFFBF8"
-		android:textSize="48sp"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="@+id/drawActivityButton"
-		app:layout_constraintHorizontal_bias="0.493"
-		app:layout_constraintStart_toStartOf="@+id/drawActivityButton"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.178" />
 
-	<Button
-		android:id="@+id/drawActivityButton"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="32dp"
-		android:text="START NEW PROJECT"
-		android:textStyle="bold"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.497"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-		app:layout_constraintVertical_bias="0.003" />
-
-	<Button
-		android:id="@+id/galleryActivityButton"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="OPEN PROJECT"
-		android:textStyle="bold"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.498"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/drawActivityButton"
-		app:layout_constraintVertical_bias="0.14" />
-
-	<Button
-		android:id="@+id/quitButton"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="QUIT"
-		android:textStyle="bold"
-
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.498"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/galleryActivityButton"
-		app:layout_constraintVertical_bias="0.254" / -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -8,9 +8,7 @@
 	<string name="nav_close">Close</string>
 	<string name="nav_new">NEW PROJECT</string>
 	<string name="nav_save">SAVE</string>
-	<string name="nav_load">LOAD</string>
-	<string name="nav_export">EXPORT PROJECT</string>
-	<string name="nav_import">IMPORT PROJECT</string>
+	<string name="nav_open_gallery">OPEN GALLERY</string>
 	<string name="nav_delete">DELETE PROJECT</string>
 	<string name="action_undo">Undo</string>
 	<string name="action_redo">Redo</string>
