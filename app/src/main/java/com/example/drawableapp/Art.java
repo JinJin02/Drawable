@@ -230,7 +230,8 @@ public class Art extends androidx.appcompat.widget.AppCompatImageView {
 			invalidate();                                  //means the canvas redraws itself
 		} else {
 
-			this.executeToast("Nothing to undo");
+			Toaster.show(this.getContext(), "Nothing to undo");
+//			Toaster.show(this.getContext(), "Nothing to undo");
 		}
 	}
 
@@ -244,7 +245,7 @@ public class Art extends androidx.appcompat.widget.AppCompatImageView {
 			invalidate();
 		} else {
 
-			this.executeToast("Nothing to redo");
+			Toaster.show(this.getContext(), "Nothing to redo");
 		}
 	}
 

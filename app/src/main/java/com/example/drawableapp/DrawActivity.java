@@ -114,11 +114,9 @@ public class DrawActivity extends AppCompatActivity implements
 		switch (item.getItemId()) {
 			case R.id.action_undo:
 				art.undo();
-				System.out.println("R.id.action_undo");
 				return true;
 			case R.id.action_redo:
 				art.redo();
-				System.out.println("R.id.action_redo");
 				return true;
 			case R.id.action_share:
 				share();
@@ -217,9 +215,10 @@ public class DrawActivity extends AppCompatActivity implements
 					checkIfNameTaken(name);
 					dialog.dismiss();
 				} else {
-					Toast toast = Toast.makeText(getApplicationContext(), "Please enter a name!", Toast.LENGTH_LONG);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
+					Toaster.show(DrawActivity.this, "Please enter a name!");
+//					Toast toast = Toast.makeText(getApplicationContext(), "Please enter a name!", Toast.LENGTH_LONG);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.show();
 				}
 			}
 		});
@@ -238,9 +237,10 @@ public class DrawActivity extends AppCompatActivity implements
 		projectRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
 			@Override
 			public void onSuccess(Uri uri) {
-				Toast toast = Toast.makeText(getApplicationContext(), "This name already exists", Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
-				toast.show();
+				Toaster.show(DrawActivity.this, "This name already exists");
+//				Toast toast = Toast.makeText(getApplicationContext(), "This name already exists", Toast.LENGTH_LONG);
+//				toast.setGravity(Gravity.CENTER, 0, 0);
+//				toast.show();
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
@@ -273,18 +273,20 @@ public class DrawActivity extends AppCompatActivity implements
 				@Override
 				public void onFailure(@NonNull Exception exception) {
 					// Handle unsuccessful uploads
-					Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
+					Toaster.show(DrawActivity.this, exception.toString());
+//					Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.show();
 				}
 			}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 				@Override
 				public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 					//baos.reset();
 
-					Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
+					Toaster.show(DrawActivity.this, "Saved successfully!");
+//					Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.show();
 					art.setName(name);
 					getSupportActionBar().setTitle(name);
 					art.setDrawingCacheEnabled(false);
@@ -337,17 +339,19 @@ public class DrawActivity extends AppCompatActivity implements
 			@Override
 			public void onSuccess(Void aVoid) {
 				resetProject();
-				Toast toast = Toast.makeText(getApplicationContext(), "Deleted succesfully!", Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
-				toast.show();
+				Toaster.show(DrawActivity.this, "Deleted succesfully!");
+//				Toast toast = Toast.makeText(getApplicationContext(), "Deleted succesfully!", Toast.LENGTH_LONG);
+//				toast.setGravity(Gravity.CENTER, 0, 0);
+//				toast.show();
 
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
-				Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
-				toast.show();
+				Toaster.show(DrawActivity.this, exception.toString());
+//				Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
+//				toast.setGravity(Gravity.CENTER, 0, 0);
+//				toast.show();
 			}
 		});
 	}
@@ -375,9 +379,10 @@ public class DrawActivity extends AppCompatActivity implements
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
-				Toast toast = Toast.makeText(getApplicationContext(), "Please save project!", Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, 0);
-				toast.show();
+				Toaster.show(DrawActivity.this, "Please save project!");
+//				Toast toast = Toast.makeText(getApplicationContext(), "Please save project!", Toast.LENGTH_LONG);
+//				toast.setGravity(Gravity.CENTER, 0, 0);
+//				toast.show();
 
 			}
 		});
