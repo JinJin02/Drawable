@@ -76,14 +76,14 @@ public class DrawActivity extends AppCompatActivity implements
 
 		Bundle bundle = this.getIntent().getExtras();
 		if (bundle != null) {
-			ConstraintLayout test = findViewById(R.id.art_constraint);
+//			ConstraintLayout test = findViewById(R.id.art_constraint);
 			this.art.setBackgroundColor(bundle.getInt("BACKGROUND_COLOR"));
-			this.art.setName(bundle.getString("IMAGE_NAME"));
-			getSupportActionBar().setTitle(bundle.getString("IMAGE_NAME"));
-			Bitmap b = BitmapFactory.decodeByteArray(
-					getIntent().getByteArrayExtra("byteArray"),0,getIntent().getByteArrayExtra("byteArray").length);
-			this.art.setImageBitmap(b);
-			Glide.with(test.getContext()).load(bundle.getString("IMAGE_URL")).into(art);
+//			this.art.setName(bundle.getString("IMAGE_NAME"));
+//			getSupportActionBar().setTitle(bundle.getString("IMAGE_NAME"));
+//			Bitmap b = BitmapFactory.decodeByteArray(
+//					getIntent().getByteArrayExtra("byteArray"),0,getIntent().getByteArrayExtra("byteArray").length);
+//			this.art.setImageBitmap(b);
+//			Glide.with(test.getContext()).load(bundle.getString("IMAGE_URL")).into(art);
 		}
 
 		this.burgerRoot = this.findViewById(R.id.burger_root);
@@ -133,7 +133,6 @@ public class DrawActivity extends AppCompatActivity implements
 		switch (item.getItemId()) {
 			case R.id.nav_new:
 				resetProjectDialog(ResetAction.NEW_PROJECT);
-
 				break;
 			case R.id.nav_save:
 				if(art.getName().isEmpty()){
@@ -147,8 +146,7 @@ public class DrawActivity extends AppCompatActivity implements
 				startActivity(intent);
 				break;
 			case R.id.nav_delete:
-
-				if(!art.getName().isEmpty()){
+				if (!art.getName().isEmpty()) {
 					resetProjectDialog(ResetAction.DELETE_PROJECT);
 				}
 				break;
@@ -223,7 +221,6 @@ public class DrawActivity extends AppCompatActivity implements
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 				}
-
 			}
 		});
 		cancelBtn.setOnClickListener(new View.OnClickListener() {
@@ -244,17 +241,13 @@ public class DrawActivity extends AppCompatActivity implements
 				Toast toast = Toast.makeText(getApplicationContext(), "This name already exists", Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.CENTER, 0, 0);
 				toast.show();
-
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception exception) {
-
 				uploadImage(name);
-
 			}
 		});
-
 	}
 
 	public void uploadImage(String name){
@@ -262,44 +255,41 @@ public class DrawActivity extends AppCompatActivity implements
 		//StorageReference fileRef = storageRef.child(userID + "/");
 		//StorageReference projectRef = fileRef.child(name + ".jpg");
 
-
 		StorageReference projectRef = storageRef.child(name + ".jpg");
-				//ändra art viewn till en jpeg
-				art.setDrawingCacheEnabled(true);
-				art.buildDrawingCache();
-				Bitmap bitmap = art.getDrawingCache();
+			//ändra art viewn till en jpeg
+			art.setDrawingCacheEnabled(true);
+			art.buildDrawingCache();
+			Bitmap bitmap = art.getDrawingCache();
 
-				//bitmap = getBitmapFromView(art);
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-				byte[] data = baos.toByteArray();
-
-
-				//ladda upp bilden
-				UploadTask uploadTask = projectRef.putBytes(data);
-				uploadTask.addOnFailureListener(new OnFailureListener() {
-					@Override
-					public void onFailure(@NonNull Exception exception) {
-						// Handle unsuccessful uploads
-						Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
-						toast.setGravity(Gravity.CENTER, 0, 0);
-						toast.show();
-					}
-				}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-					@Override
-					public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-							//baos.reset();
-
-							Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
-							toast.setGravity(Gravity.CENTER, 0, 0);
-							toast.show();
-							art.setName(name);
-							getSupportActionBar().setTitle(name);
-							art.setDrawingCacheEnabled(false);
-					}
-				});
+			//bitmap = getBitmapFromView(art);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+			byte[] data = baos.toByteArray();
 
 
+			//ladda upp bilden
+			UploadTask uploadTask = projectRef.putBytes(data);
+			uploadTask.addOnFailureListener(new OnFailureListener() {
+				@Override
+				public void onFailure(@NonNull Exception exception) {
+					// Handle unsuccessful uploads
+					Toast toast = Toast.makeText(getApplicationContext(), exception.toString(), Toast.LENGTH_LONG);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+				}
+			}).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+				@Override
+				public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+					//baos.reset();
+
+					Toast toast=Toast.makeText(getApplicationContext(),"Saved successfully!",Toast.LENGTH_LONG);
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+					art.setName(name);
+					getSupportActionBar().setTitle(name);
+					art.setDrawingCacheEnabled(false);
+				}
+			});
 	}
 
 	public void resetProjectDialog(ResetAction resetAction){
@@ -310,35 +300,32 @@ public class DrawActivity extends AppCompatActivity implements
 		switch (this.resetAction) {
 			case NEW_PROJECT:
 				builder.setMessage(R.string.reset_action_new).setCancelable(false)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								resetProject();
-								dialog.cancel();
-
-							}
-						});
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							resetProject();
+							dialog.cancel();
+						}
+					});
 				break;
 			case DELETE_PROJECT:
 				builder.setMessage(R.string.reset_action_delete).setCancelable(false)
-						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								deleteProject();
-								dialog.cancel();
-
-							}
-						});
+					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							deleteProject();
+							dialog.cancel();
+						}
+					});
 				break;
 		}
-		builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						//  Action for 'NO' Button
-						dialog.cancel();
 
-					}
-				});
+		builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//  Action for 'NO' Button
+				dialog.cancel();
+			}
+		});
 		//Creating dialog box
 		AlertDialog alert = builder.create();
-		//Setting the title manually
 
 		alert.show();
 	}
@@ -369,7 +356,7 @@ public class DrawActivity extends AppCompatActivity implements
 		this.art.reset(0xffffffff);
 		this.art.setName("");
 		getSupportActionBar().setTitle(this.art.getName());
-		ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff);
+		ColorPicker.get().show(this, ColorPicker.Mode.CREATE, 0xffffffff, 0xff000000);
 	}
 
 	private void share(){
@@ -413,7 +400,7 @@ public class DrawActivity extends AppCompatActivity implements
 
 
 	public void showColorPickerPen(View view) {
-		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_PEN, this.art.getPenColor());
+		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_PEN, this.art.getPenColor(), this.art.getBackgroundColor());
 	}
 
 	public void selectPen(View view) {
@@ -434,8 +421,8 @@ public class DrawActivity extends AppCompatActivity implements
 		this.art.selectEraser();
 	}
 
-	public void showColorPickerBackground(View view) {
-		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_BACKGROUND, this.art.getBackgroundColor());
-	}
+//	public void showColorPickerBackground(View view) {
+//		ColorPicker.get().show(this, ColorPicker.Mode.ALTER_BACKGROUND, this.art.getBackgroundColor());
+//	}
 }
 

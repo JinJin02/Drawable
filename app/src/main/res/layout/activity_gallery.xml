@@ -4,9 +4,10 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:background="@drawable/vru46z">
+	android:background="#ff000000">
+	<!--	android:background="@drawable/vru46z" -->
 
-	<ImageButton
+	<!-- ImageButton
 		android:id="@+id/backButton"
 		android:layout_width="48dp"
 		android:layout_height="wrap_content"
@@ -16,9 +17,9 @@
 		app:layout_constraintBottom_toTopOf="@+id/frameLayout"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		app:srcCompat="@android:drawable/ic_menu_revert" />
+		app:srcCompat="@android:drawable/ic_menu_revert" / -->
 
-	<TextView
+	<!-- TextView
 		android:id="@+id/edit_text"
 		android:layout_width="278dp"
 		android:layout_height="69dp"
@@ -33,9 +34,7 @@
 		app:layout_constraintHorizontal_bias="0.879"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.024">
-
-	</TextView>
+		app:layout_constraintVertical_bias="0.024" / -->
 
 	<FrameLayout
 		android:id="@+id/frameLayout"
@@ -47,23 +46,23 @@
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/backButton">
+		app:layout_constraintTop_toTopOf="parent">
 
 		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recycler_view"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:id="@+id/recycler_view"
 			app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-			tools:listitem="@layout/gallery_item"/>
+			tools:listitem="@layout/gallery_item" />
 
 		<ProgressBar
+			android:id="@+id/progress"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/progress"
 			android:layout_gravity="center"
-			android:indeterminate="true"/>
-	</FrameLayout>
+			android:indeterminate="true" />
 
+	</FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

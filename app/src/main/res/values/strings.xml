@@ -1,6 +1,6 @@
 <resources>
 	<string name="app_name">Drawable</string>
-	<string name="section">Gallery</string>
+	<string name="app_gallery">Gallery</string>
 	<string name="color_picker_create">Please select a canvas color</string>
 	<string name="color_picker_alter">Pick a new color</string>
 	<string name="size_seeker_title">Set the pen size</string>

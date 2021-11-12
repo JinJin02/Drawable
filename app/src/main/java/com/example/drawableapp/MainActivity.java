@@ -3,7 +3,6 @@ package com.example.drawableapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -22,28 +21,9 @@ public class MainActivity extends AppCompatActivity implements ColorPicker.Color
 		mainLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(MainActivity.this, DrawActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				ColorPicker.get().show(MainActivity.this, ColorPicker.Mode.CREATE, 0xffffffff, 0xff000000);
 			}
 		});
-
-//		Button drawActivityButton = (Button) this.findViewById(R.id.drawActivityButton);
-//		drawActivityButton.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View view) {
-//				ColorPicker.get().show(MainActivity.this, ColorPicker.Mode.CREATE, 0xffffffff);z
-//			}
-//		});
-//
-//		Button galleryActivityButton = (Button) this.findViewById(R.id.galleryActivityButton);
-//		galleryActivityButton.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View view) {
-//				Intent intent = new Intent(MainActivity.this, GalleryActivity.class);
-//				startActivity(intent);
-//			}
-//		});
 	}
 
 	// Purpose: When a background color has been picked (OK) for the new project, control is

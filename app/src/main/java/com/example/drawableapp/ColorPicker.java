@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.ArrayList;
+
 public class ColorPicker {
 	private static ColorPicker colorPicker;
 	private ColorPickerListener listener;
@@ -24,6 +26,7 @@ public class ColorPicker {
 		0xff000000, 0xff7f7f7f, 0xffffffff, 0xffff0000, 0xffff7f00,
 		0xffffff00, 0xff7fff00, 0xff00ff00, 0xff00ff7f, 0xff00ffff,
 		0xff007fff, 0xff0000ff, 0xff7f00ff, 0xffff00ff, 0xffff007f };
+	private ArrayList<Integer> availableColors = new ArrayList<Integer>();
 	private int[] buttonIds;
 	private final int colorsPerRow = 5;
 	private int pickedId;
@@ -40,9 +43,7 @@ public class ColorPicker {
 
 	// Purpose: Constructor!
 	// Arguments: -
-	private ColorPicker() {
-		this.buttonIds = new int[this.buttonColors.length];
-	}
+	private ColorPicker() {}
 
 	// Purpose: This creates and/or returns a reference to the only object.
 	// Arguments: -
@@ -67,7 +68,17 @@ public class ColorPicker {
 		return shape;
 	}
 
-	private void createDialog() {
+	private void createDialog(int excludedColor) {
+		this.availableColors.clear();
+		for (int i = 0; i < this.buttonColors.length; i++) {
+			if (this.buttonColors[i] == excludedColor) {
+				continue;
+			}
+			this.availableColors.add(this.buttonColors[i]);
+		}
+
+		this.buttonIds = new int[this.availableColors.size()];
+
 		// Set some layout sizes. These use context and cannot be in the constructor.
 		int sizeLarge = this.toDip(48);
 		int sizeMedium = this.toDip(24);
@@ -126,12 +137,12 @@ public class ColorPicker {
 		layout.addView(cancelButton);
 
 		// The color buttons:
-		for (int i = 0; i < this.buttonColors.length; i++) {
+		for (int i = 0; i < this.availableColors.size(); i++) {
 			ImageButton button = new ImageButton(this.context);
 			this.buttonIds[i] = button.generateViewId();
 			button.setId(this.buttonIds[i]);
-			button.setTag(this.buttonColors[i]);
-			button.setBackgroundColor(this.buttonColors[i]);
+			button.setTag(this.availableColors.get(i));
+			button.setBackgroundColor(this.availableColors.get(i));
 			ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(sizeLarge, sizeLarge);
 
 			// The first button on each row:
@@ -159,7 +170,7 @@ public class ColorPicker {
 			}
 
 			// The very last button:
-			if (i == buttonColors.length - 1) {
+			if (i == this.availableColors.size() - 1) {
 				params.bottomToTop = okButtonId;
 				params.bottomMargin = sizeMedium;
 			}
@@ -191,7 +202,7 @@ public class ColorPicker {
 	// Purpose: Use this method to open/create a dialog window.
 	// Arguments: Context context, ColorPicker.Mode mode, int currentColor
 	// Returns: -
-	public void show(Context context, Mode mode, int currentColor) {
+	public void show(Context context, Mode mode, int currentColor, int excludedColor) {
 		// If no colors are defined, this class won't work. On the other hand, it won't work without
 		// a bunch of other information and I'm only checking this, so …
 		if (this.buttonColors.length == 0) {
@@ -199,10 +210,10 @@ public class ColorPicker {
 		}
 
 		// If this is called from a different activity, create a new dialog.
-		if (context != this.context) {
+//		if (context != this.context) {
 			this.context = context;
-			this.createDialog();
-		}
+			this.createDialog(excludedColor);
+//		}
 
 		this.dialogMode = mode;
 

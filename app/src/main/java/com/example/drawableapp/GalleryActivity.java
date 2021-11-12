@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,22 +35,23 @@ public class GalleryActivity extends AppCompatActivity {
 	ImageAdapter adapter;
 	FirebaseStorage storage = FirebaseStorage.getInstance();
 	StorageReference storageRef = storage.getReference();
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Hide the top app bar.
-		this.getSupportActionBar().hide();
+		this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		this.getSupportActionBar().setTitle(R.string.app_gallery);
 
 		this.setContentView(R.layout.activity_gallery);
 
-		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
-		backButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				finish();
-			}
-		});
+//		ImageButton backButton = (ImageButton) this.findViewById(R.id.backButton);
+//		backButton.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				finish();
+//			}
+//		});
 
 		imagelist=new ArrayList<>();
 		namelist=new ArrayList<>();
@@ -89,5 +91,10 @@ public class GalleryActivity extends AppCompatActivity {
 		return name;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+		this.finish();
+		return true;
+	}
 }
 

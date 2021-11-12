@@ -32,56 +32,32 @@
 			app:layout_constraintStart_toStartOf="parent">
 
 			<ImageButton
-				android:id="@+id/penColorButton"
-				android:layout_width="60dp"
-				android:layout_height="60dp"
-				android:layout_marginStart="12dp"
-				android:background="@drawable/spectrum"
-				android:tint="#000000"
-				android:tintMode="multiply"
-				android:onClick="showColorPickerPen"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent"
-				app:srcCompat="@android:drawable/ic_menu_edit" />
-
-			<ImageButton
 				android:id="@+id/penButton"
 				android:layout_width="48dp"
 				android:layout_height="48dp"
-				android:layout_marginStart="12dp"
+				android:layout_marginLeft="32dp"
 				android:background="#bfbfbf"
 				android:onClick="selectPen"
 				android:tint="#000000"
 				android:tintMode="multiply"
 				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintStart_toEndOf="@+id/penColorButton"
+				app:layout_constraintLeft_toLeftOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
 				app:srcCompat="@android:drawable/ic_menu_edit" />
-
-			<ImageView
-				android:id="@+id/sizeImage"
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:onClick="showSizeSeeker"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintEnd_toStartOf="@+id/eraserButton"
-				app:layout_constraintStart_toEndOf="@+id/penButton"
-				app:layout_constraintTop_toTopOf="parent" />
 
 			<ImageButton
 				android:id="@+id/eraserButton"
 				android:layout_width="48dp"
 				android:layout_height="48dp"
-				android:layout_marginEnd="12dp"
+				android:layout_marginLeft="32dp"
 				android:background="#dfdfdf"
 				android:onClick="selectEraser"
 				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintEnd_toStartOf="@+id/backgroundColorButton"
+				app:layout_constraintLeft_toRightOf="@+id/penButton"
 				app:layout_constraintTop_toTopOf="parent"
 				app:srcCompat="@drawable/eraser32x32" />
 
-			<ImageButton
+			<!-- ImageButton
 				android:id="@+id/backgroundColorButton"
 				android:layout_width="60dp"
 				android:layout_height="60dp"
@@ -93,7 +69,28 @@
 				app:layout_constraintBottom_toBottomOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintTop_toTopOf="parent"
-				app:srcCompat="@android:drawable/ic_menu_gallery" />
+				app:srcCompat="@android:drawable/ic_menu_gallery" / -->
+
+			<ImageView
+				android:id="@+id/sizeImage"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_marginRight="32dp"
+				android:onClick="showSizeSeeker"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintRight_toLeftOf="@+id/penColorButton"
+				app:layout_constraintTop_toTopOf="parent" />
+
+			<ImageButton
+				android:id="@+id/penColorButton"
+				android:layout_width="60dp"
+				android:layout_height="60dp"
+				android:layout_marginRight="32dp"
+				android:background="@drawable/spectrum"
+				android:onClick="showColorPickerPen"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintRight_toRightOf="parent"
+				app:layout_constraintTop_toTopOf="parent" />
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
 

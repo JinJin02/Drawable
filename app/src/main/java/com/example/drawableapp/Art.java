@@ -22,9 +22,11 @@ public class Art extends androidx.appcompat.widget.AppCompatImageView {
 	private Paint pen = new Paint();
 	private Path path;
 	private ArrayList<Integer> colors = new ArrayList<Integer>();
+	private ArrayList<Integer> colors_undo = new ArrayList<Integer>();
 	private ArrayList<Float> sizes = new ArrayList<Float>();
+	private ArrayList<Float> sizes_undo = new ArrayList<Float>();
 	private ArrayList<Path> paths = new ArrayList<Path>();
-	private ArrayList<Path> undo = new ArrayList<Path>();
+	private ArrayList<Path> paths_undo = new ArrayList<Path>();
 	private int backgroundColor = 0xffffffff; // White!
 	private int penColor = 0xff000000; // Black! This variable is used to toggle pen/eraser mode.
 	private float penSize = 12.0f;
@@ -34,6 +36,9 @@ public class Art extends androidx.appcompat.widget.AppCompatImageView {
 
 	private Drawable mDrawable = null;
 	private BitmapDrawable mRecycleableBitmapDrawable = null;
+
+	private Toast toast;
+
 	// Purpose: Constructor!
 	// Arguments: Context context
 	public Art(Context context) {
@@ -206,26 +211,40 @@ public class Art extends androidx.appcompat.widget.AppCompatImageView {
 		this.invalidate();
 	}
 
+	private void executeToast(String message) {
+		// If a the toast is already active, cancel it.
+		if (this.toast != null) {
+			this.toast.cancel();
+		}
+
+		this.toast = Toast.makeText(this.getContext(), message, Toast.LENGTH_SHORT);
+		this.toast.show();
+	}
+
 	public void undo() {
 
 		if (paths.size() != 0) {
-			undo.add(paths.remove(paths.size()-1));  //undo drawing
+			colors_undo.add(colors.remove(colors.size()-1));  //undo drawing
+			sizes_undo.add(sizes.remove(sizes.size()-1));  //undo drawing
+			paths_undo.add(paths.remove(paths.size()-1));  //undo drawing
 			invalidate();                                  //means the canvas redraws itself
 		} else {
 
-			Toast.makeText(getContext(),"Nothing to undo",Toast.LENGTH_LONG).show();
+			this.executeToast("Nothing to undo");
 		}
 	}
 
 	public void redo() {
 
-		if (undo.size() !=0) {
+		if (paths_undo.size() !=0) {
 
-			paths.add(undo.remove(undo.size() - 1));   //puts back undone drawing
+			colors.add(colors_undo.remove(colors_undo.size() - 1));   //puts back undone drawing
+			sizes.add(sizes_undo.remove(sizes_undo.size() - 1));   //puts back undone drawing
+			paths.add(paths_undo.remove(paths_undo.size() - 1));   //puts back undone drawing
 			invalidate();
 		} else {
 
-			Toast.makeText(getContext(),"Nothing to redo",Toast.LENGTH_LONG).show();
+			this.executeToast("Nothing to redo");
 		}
 	}
 
